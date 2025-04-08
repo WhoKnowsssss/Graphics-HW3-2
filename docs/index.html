@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Your Name  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 3-2: Additional Features to PathTracer</h1>
+    <h2 align="middle">Your Name</h2>
+    <h2 align="middle">(Webpage URL)</h2>
+
+    <div class="padded">
+
+        
+
+        <h3 align="middle">Part 1. Mirror and Glass Materials</h3>
+
+        <p><b>
+            Show a sequence of six images of scene `CBspheres.dae` rendered with `max_ray_depth` set to 0, 1, 2, 3, 4, 5, and 100. The other settings should be at least 64 samples per pixel and 4 samples per light. Make sure to include all screenshots.
+        </b></p>
+
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_0.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 0</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_1.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 1</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_2.png" alt="CBspheres max_ray_depth 2" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 2</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_3.png" alt="CBspheres max_ray_depth 3" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 3</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_4.png" alt="CBspheres max_ray_depth 4" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 4</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_5.png" alt="CBspheres max_ray_depth 5" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 5</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/CBspheres_100.png" alt="CBspheres max_ray_depth 100" style="width: 100%;" />
+                            <figcaption>max_ray_depth = 100</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </p>
+        <br>
+        <p><b>
+            Point out the new multibounce effects that appear in each image. Explain how these bounce numbers relate to the particular effects that appear. Make sure to include all screenshots.
+
+        </b></p>
+        <p>
+            <p><strong>0 Bounces:</strong> When there is no bounce effect, we can only see the light source itself, because we can only see rays directly from the light source.</p>
+
+            <p><strong>1 Bounce:</strong> When we have one bounce, the walls are illuminated and shadows are clearly visible, but the balls are still mostly black except the light source. This is because the walls can reflect the light sources, so they become visible. However, the reflective balls can only show the direct reflection of the light source, which is bright highlights with other parts of the balls black. </p>
+
+            <p><strong>2 Bounces:</strong> At two bounces, the ceiling is also illuminated because of the rays reflected from the walls. the mirror on the balls appears because light rays can reach the ball and then the box with two bounces. However, the reflected ceiling on the ball is still black, because it needs three bounces to reach the ceiling again.</p>
+
+            <p><strong>3 Bounces:</strong> With three bounces, the most visible change is that the right ball becomes refractive. This is because light rays can now enter the sphere, exit the sphere, and reach the walls with 3 bounces. Notice that the reflection of the right ball on the left ball is still dark, because the mirror reflection is 1 bounce behind. </p>
+
+            <p><strong>4 Bounces:</strong> With four bounces, we can see the refractive effect of the right ball on the left ball. Furthermore, we can see the shadow caustics under the right ball. To create the caustics effect, the rays need to strike floor, go into the ball and out of sphere, and finally reach the box, so 4 bounces are necessary. </p>
+
+            <p><strong>5 Bounces:</strong> With five bounces, we can further see a small light patch on the blue wall created by the balls. This is because the light rays can now reach and reflect off the left ball, enter and exit the right ball from the side, and finally reach the blue wall.</p>
+
+            <p><strong>100 Bounces:</strong> After 100 bounces, the lighting has converged, and the difference is not significant. We can see the caustics become softer and the scene is slightly brighter as a result of the accumulation of additional bounces.</p>
+        </p>
+
+        <br>
+
+
+        <h3 align="middle">Part 2. Microfacet Material</h3>
+        <p><b>
+            Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
+        </b></p>
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_0_005.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>alpha = 0.005</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_0_05.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>alpha = 0.05</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_0_25.png" alt="CBspheres max_ray_depth 2" style="width: 100%;" />
+                            <figcaption>alpha = 0.25</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_0_5.png" alt="CBspheres max_ray_depth 3" style="width: 100%;" />
+                            <figcaption>alpha = 0.5</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+
+            We learned that alpha is the roughness of the macro surface, which is shown clearly in this series of images. When the surface is very smooth, we see a lot of specular reflection where the object looks very shiny and metallic. As alpha goes up, we see more diffuse reflection, where the surface appears rougher, and the highlights become broader and smoother, giving it a more matte appearance.
+        </p>
+        <br>
+        <p><b>
+            Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling. The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Briefly discuss their difference.
+        </b></p>
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/bunny_hemi.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>Hemisphere Sampling</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/bunny_importance.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>Importance Sampling</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            We see that hemisphere sampling results in more noise and some areas of the bunny not lit up, while importance sampling gives a quite nice rendering.
+            This is because while hemisphere sampling works to some extent for diffuse BRDF, it becomes significantly more noisy for the microfacet BRDF which is not uniform across the hemisphere, and thus the lights are not distributed evenly. The importance sampling method uses the distribution of the microfacet BRDF to sample more frequently in directions light contributes more significantly, leading to clearer results with the same number of samples. 
+
+        </p>
+        <br>
+        <p><b>
+            Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to. 
+        </b></p>
+        <p>
+            <div align="middle">
+                
+            <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                <img src="./images/bunny_v.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                <figcaption>alpha = 0.005</figcaption>
+            </figure>
+                        
+            </div>
+            This image is rendered with Vanadium as the material. The image shows a very shiny surface with a lot of specular reflection and a silvery-gray color characteristic of Vanadium. 
+            For Vanadium, the values of `eta` and `k` are: 
+            <br>
+            eta: 0.47943 0.60990 0.85840
+            <br>
+            k: 5.1811 4.5120 3.7397
+        </p>
+        <br>
+        
+        
+        
+
+        <h3 align="middle">Part 3. Environment Lightl</h3>
+        <b>Pick one *.exr* file to use for all subparts here. Include a converted *.jpg* of it in your website so we know what map you are using.</b>
+        
+        <p><b>
+            In a few sentences, explain the ideas behind environment lighting (i.e. why we do it/how it works).
+        </b></p>
+        <p>
+            In environment lighting, we assume the light source is infinitely far, supplying radiance from all directions. We achieve this by using a texture map parameterized by spherical coordinates (phi and theta) to define the intensity of light from each direction. Then, we sample random directions of the sphere, compute the intensity of the light source in that direction, and integrate the samples so that all directions of the light source are considered. This approach creates more natural and realistic lighting effects especially in outdoor environments, as real-world lighting conditions, such as sunlight or overcast skies, are considered as infinitely far light sources that illuminate the scene from all angles.
+        </p>
+        </p>
+        <br>
+        <p><b>
+            Show the *probability_debug.png* file for the *.exr* file you are using, generated using the `save_probability_debug()` helper function after initializing your probability distributions.
+        </b></p>
+        <p>
+            <div align="middle">
+                
+                <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                    <img src="./images/probability_debug.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                    <figcaption>probability_debug.png</figcaption>
+                </figure>
+                            
+                </div>
+        </p>
+        <br>
+        <p><b>
+            Use the `bunny_unlit.dae` scene and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/bunny_exr_uniform.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>Hemisphere Sampling</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/bunny_exr_importance.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>Importance Sampling</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            We can see that importance sampling on the right significantly reduces the noise level all over the object. This shows the effectiveness of importance sampling in reducing noise under the same number of samples. 
+        </p>
+        <br>
+        <p><b>
+            Use a different image (if you did part 2, we recommend `bunny_microfacet_cu_unlit.dae`) and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/bunny_mf_exr_uniform.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>Hemisphere Sampling</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/bunny_mf_exr_importance.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>Importance Sampling</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            Similarly, we also see that the importance sampling result on the right shows reduced noise levels, particularly in the shadow areas of the bunny and the base of the bunny.
+        </p>
+        <br>
+
+
+
+        <h3 align="middle">Part 4. Depth of Field</h3>
+        <b>
+            For these subparts, we recommend using a microfacet BSDF scene to show off the cool out of focus effects you can get with depth of field!
+        </b>
+        <p><b>
+            In a few sentences, explain the differences between a pinhole camera model and a thin-lens camera model. 
+        </b></p>
+        <p>
+            The pinhole camera model is a simplified camera that assumes an infinitely small aperture, so only a single ray of light from each point in the scene can pass through and it thus forms a perfectly sharp image on the sensor. However, it lacks the ability to control focus or depth of field. In contrast, the thin-lens camera model incorporates a lens with a finite aperture, enabling the simulation of realistic optical effects such as focusing on specific depths and creating depth of field. This makes the thin-lens model more versatile and accurate for rendering scenes with varying focal points and blurred backgrounds, mimicking real-world photography.
+        </p>
+        </p>
+        <br>
+        <p><b>
+            Show a "focus stack" where you focus at 4 visibly different depths through a scene. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_focal_4.5.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>Focal = 4.5</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_focal_4.7.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>Focal = 4.7</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_focal_4.85.png" alt="CBspheres max_ray_depth 2" style="width: 100%;" />
+                            <figcaption>Focal = 4.85</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_focal_5.0.png" alt="CBspheres max_ray_depth 3" style="width: 100%;" />
+                            <figcaption>Focal = 5.0</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+
+            With different focal lengths and a large aperture, we can focus on one small part of the object as the highlight and have other parts of the object blurred out.
+            This is because the rays that are not focused on the object will be blurred out, and the rays that are focused on the object will be sharp.
+        </p>
+        <br>
+        <p><b>
+            Show a sequence of 4 pictures with visibly different aperture sizes, all focused at the same point in a scene. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            <div align="middle">
+                <div style="text-align: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_aperture_0.1.png" alt="CBspheres max_ray_depth 0" style="width: 100%;" />
+                            <figcaption>Aperture = 0.1</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_aperture_0.3.png" alt="CBspheres max_ray_depth 1" style="width: 100%;" />
+                            <figcaption>Aperture = 0.3</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_aperture_0.5.png" alt="CBspheres max_ray_depth 2" style="width: 100%;" />
+                            <figcaption>Aperture = 0.5</figcaption>
+                        </figure>
+                        <figure style="flex: 1 1 calc(33.33% - 10px); text-align: center;">
+                            <img src="./images/dragon_aperture_0.7.png" alt="CBspheres max_ray_depth 3" style="width: 100%;" />
+                            <figcaption>Aperture = 0.7</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            The aperture size directly affects the depth of field in an image. A smaller aperture (e.g., 0.1) results in a larger depth of field, meaning more of the scene appears in focus. Conversely, a larger aperture (e.g., 0.7) creates a shallower depth of field, where only a small portion of the scene is in focus, and the rest is blurred. This effect is often used to draw attention to a specific subject while creating a background blur.
+        </p>
+        <br>
+
+    </div>
+</body>
+</html>
+
